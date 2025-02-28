@@ -57,38 +57,52 @@ const DocumentDetailsModal: React.FC<DocumentDetailsModalProps> = ({
       <div className="modal-content">
         <div className="pdf-preview">
           {metadata?.fileUrl ? (
-            <Document
-              file={API_BASE_URL.replace('/api', '') + metadata.fileUrl}
-              onLoadSuccess={onDocumentLoadSuccess}
-              onLoadError={onDocumentLoadError}
-              loading={<div className="loading">Loading PDF...</div>}
-              error={
-                <div className="error">
-                  {pdfError ? `Error: ${pdfError}` : 'Failed to load PDF.'}
+            <>
+              <div className="pdf-content">
+                <Document
+                  file={API_BASE_URL.replace('/api', '') + metadata.fileUrl}
+                  onLoadSuccess={onDocumentLoadSuccess}
+                  onLoadError={onDocumentLoadError}
+                  loading={<div className="loading">Loading PDF...</div>}
+                  error={
+                    <div className="error">
+                      {pdfError ? `Error: ${pdfError}` : 'Failed to load PDF.'}
+                    </div>
+                  }
+                >
+                  {numPages !== null && numPages > 0 && (
+                    <div style={{ width: '100%' }}>
+                      <Page 
+                        pageNumber={currentPage} 
+                        scale={1.0}
+                        renderTextLayer={false}
+                        renderAnnotationLayer={false}
+                        width={800}
+                      />
+                    </div>
+                  )}
+                </Document>
+              </div>
+              {numPages !== null && numPages > 0 && (
+                <div className="pdf-navigation">
+                  <button
+                    onClick={() => setCurrentPage(p => Math.max(1, p - 1))}
+                    disabled={currentPage <= 1}
+                  >
+                    Previous
+                  </button>
+                  <span>Page {currentPage} of {numPages}</span>
+                  <button
+                    onClick={() => setCurrentPage(p => Math.min(numPages, p + 1))}
+                    disabled={currentPage >= numPages}
+                  >
+                    Next
+                  </button>
                 </div>
-              }
-            >
-              {numPages !== null && numPages > 0 && <Page pageNumber={currentPage} />}
-            </Document>
+              )}
+            </>
           ) : (
             <div className="error">No PDF file available.</div>
-          )}
-          {numPages !== null && numPages > 0 && (
-            <div className="pdf-navigation">
-              <button
-                onClick={() => setCurrentPage(p => Math.max(1, p - 1))}
-                disabled={currentPage <= 1}
-              >
-                Previous
-              </button>
-              <span>Page {currentPage} of {numPages}</span>
-              <button
-                onClick={() => setCurrentPage(p => Math.min(numPages, p + 1))}
-                disabled={currentPage >= numPages}
-              >
-                Next
-              </button>
-            </div>
           )}
         </div>
         <div className="extractions-panel">
