@@ -1,35 +1,66 @@
-import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from '/vite.svg'
-import './App.css'
+import React, { useState } from 'react';
+import DocumentBox from './components/DocumentBox';
+import DocumentDetailsModal from './components/DocumentDetailsModal';
+import Logo from './components/Logo';
+import { DocumentMetadata } from './types/document';
+import { uploadDocument } from './services/api';
+import './App.css';
 
-function App() {
-  const [count, setCount] = useState(0)
+const App: React.FC = () => {
+  const [documents, setDocuments] = useState<Map<string, DocumentMetadata>>(new Map());
+  const [selectedDocument, setSelectedDocument] = useState<string | null>(null);
+  const [isModalOpen, setIsModalOpen] = useState(false);
+
+  const handleUpload = async (id: string, file: File) => {
+    try {
+      const metadata = await uploadDocument(id, file);
+      setDocuments(prev => new Map(prev).set(id, metadata));
+    } catch (error) {
+      console.error('Error uploading document:', error);
+      alert('Failed to upload document. Please try again.');
+    }
+  };
+
+  const handleView = (id: string) => {
+    setSelectedDocument(id);
+    setIsModalOpen(true);
+  };
+
+  const closeModal = () => {
+    setIsModalOpen(false);
+    setSelectedDocument(null);
+  };
 
   return (
-    <>
-      <div>
-        <a href="https://vite.dev" target="_blank">
-          <img src={viteLogo} className="logo" alt="Vite logo" />
-        </a>
-        <a href="https://react.dev" target="_blank">
-          <img src={reactLogo} className="logo react" alt="React logo" />
-        </a>
-      </div>
-      <h1>Vite + React</h1>
-      <div className="card">
-        <button onClick={() => setCount((count) => count + 1)}>
-          count is {count}
-        </button>
-        <p>
-          Edit <code>src/App.tsx</code> and save to test HMR
-        </p>
-      </div>
-      <p className="read-the-docs">
-        Click on the Vite and React logos to learn more
-      </p>
-    </>
-  )
-}
+    <div className="app">
+      <header className="app-header">
+        <Logo />
+        <h1>Legal Document Management</h1>
+      </header>
+      <main className="document-grid">
+        {Array.from({ length: 9 }, (_, i) => {
+          const id = (i + 1).toString();
+          return (
+            <DocumentBox
+              key={id}
+              id={id}
+              metadata={documents.get(id) || null}
+              onUpload={(file) => handleUpload(id, file)}
+              onView={() => handleView(id)}
+            />
+          );
+        })}
+      </main>
+      {selectedDocument && (
+        <DocumentDetailsModal
+          isOpen={isModalOpen}
+          onClose={closeModal}
+          documentId={selectedDocument}
+          metadata={documents.get(selectedDocument) || null}
+        />
+      )}
+    </div>
+  );
+};
 
-export default App
+export default App;
