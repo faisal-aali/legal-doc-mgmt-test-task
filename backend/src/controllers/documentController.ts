@@ -26,7 +26,8 @@ export const uploadDocument = (req: RequestWithFile, res: Response, next: NextFu
       id: documentId,
       fileName: req.file.originalname,
       uploadDate: new Date().toISOString(),
-      hasFile: true
+      hasFile: true,
+      fileUrl: `/uploads/${req.file.filename}`
     };
 
     documents.set(documentId, metadata);

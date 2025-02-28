@@ -1,10 +1,17 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
+import { pdfjs } from 'react-pdf';
 import DocumentBox from './components/DocumentBox';
 import DocumentDetailsModal from './components/DocumentDetailsModal';
 import Logo from './components/Logo';
 import { DocumentMetadata } from './types/document';
 import { uploadDocument } from './services/api';
 import './App.css';
+
+// Configure PDF.js worker
+pdfjs.GlobalWorkerOptions.workerSrc = new URL(
+  'pdfjs-dist/build/pdf.worker.min.mjs',
+  import.meta.url,
+).toString();
 
 const App: React.FC = () => {
   const [documents, setDocuments] = useState<Map<string, DocumentMetadata>>(new Map());

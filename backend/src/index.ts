@@ -23,6 +23,9 @@ app.use(cors());
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
+// Serve uploaded files statically
+app.use('/uploads', express.static(uploadsDir));
+
 // Routes
 app.use('/api/documents', documentRoutes);
 

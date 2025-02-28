@@ -3,6 +3,7 @@ export interface DocumentMetadata {
   fileName: string;
   uploadDate: string;
   hasFile: boolean;
+  fileUrl?: string;
 }
 
 export interface Extraction {
