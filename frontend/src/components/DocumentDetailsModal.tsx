@@ -60,14 +60,18 @@ const DocumentDetailsModal: React.FC<DocumentDetailsModalProps> = ({
       </div>
       <div className="modal-content">
         {metadata?.fileUrl ? (
-          <PDFViewer
-            fileUrl={API_BASE_URL.replace('/api', '') + metadata.fileUrl}
-            currentPage={currentPage}
-            numPages={numPages}
-            onPageChange={setCurrentPage}
-            onLoadSuccess={onDocumentLoadSuccess}
-            onLoadError={onDocumentLoadError}
-          />
+          pdfError ? (
+            <div className="error">Failed to load PDF: {pdfError}</div>
+          ) : (
+            <PDFViewer
+              fileUrl={API_BASE_URL.replace('/api', '') + metadata.fileUrl}
+              currentPage={currentPage}
+              numPages={numPages}
+              onPageChange={setCurrentPage}
+              onLoadSuccess={onDocumentLoadSuccess}
+              onLoadError={onDocumentLoadError}
+            />
+          )
         ) : (
           <div className="error">No PDF file available.</div>
         )}

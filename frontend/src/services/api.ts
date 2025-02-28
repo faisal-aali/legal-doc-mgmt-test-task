@@ -1,5 +1,5 @@
 import axios from 'axios';
-import { DocumentMetadata, DocumentExtractions } from '../types/document';
+import { DocumentMetadata } from '../types/document';
 
 export const API_BASE_URL = 'http://localhost:4000/api';
 
