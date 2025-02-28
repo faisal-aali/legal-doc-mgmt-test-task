@@ -1,6 +1,7 @@
-import { Request, Response } from 'express';
+import { Request, Response, NextFunction } from 'express';
 import { generateMockExtractions } from '../utils/mockData';
 import { DocumentMetadata } from '../types/document';
+import { CustomError } from '../utils/errors';
 
 // In-memory storage for document metadata
 const documents: Map<string, DocumentMetadata> = new Map();
@@ -9,10 +10,15 @@ interface RequestWithFile extends Request {
   file?: Express.Multer.File;
 }
 
-export const uploadDocument = (req: RequestWithFile, res: Response) => {
+export const uploadDocument = (req: RequestWithFile, res: Response, next: NextFunction) => {
   try {
     if (!req.file) {
-      return res.status(400).json({ error: 'No file uploaded' });
+      throw new CustomError('No file uploaded', 400);
+    }
+
+    // Validate file type
+    if (req.file.mimetype !== 'application/pdf') {
+      throw new CustomError('Only PDF files are allowed', 400);
     }
 
     const documentId = req.params.id;
@@ -27,40 +33,37 @@ export const uploadDocument = (req: RequestWithFile, res: Response) => {
 
     res.status(200).json(metadata);
   } catch (error) {
-    console.error('Error uploading document:', error);
-    res.status(500).json({ error: 'Failed to upload document' });
+    next(error);
   }
 };
 
-export const getExtractions = (req: Request, res: Response) => {
+export const getExtractions = (req: Request, res: Response, next: NextFunction) => {
   try {
     const documentId = req.params.id;
     const document = documents.get(documentId);
 
     if (!document || !document.hasFile) {
-      return res.status(404).json({ error: 'Document not found' });
+      throw new CustomError('Document not found', 404);
     }
 
     const extractions = generateMockExtractions(documentId);
     res.status(200).json(extractions);
   } catch (error) {
-    console.error('Error getting extractions:', error);
-    res.status(500).json({ error: 'Failed to get extractions' });
+    next(error);
   }
 };
 
-export const getDocumentMetadata = (req: Request, res: Response) => {
+export const getDocumentMetadata = (req: Request, res: Response, next: NextFunction) => {
   try {
     const documentId = req.params.id;
     const metadata = documents.get(documentId);
 
     if (!metadata) {
-      return res.status(404).json({ error: 'Document not found' });
+      throw new CustomError('Document not found', 404);
     }
 
     res.status(200).json(metadata);
   } catch (error) {
-    console.error('Error getting document metadata:', error);
-    res.status(500).json({ error: 'Failed to get document metadata' });
+    next(error);
   }
 }; 
