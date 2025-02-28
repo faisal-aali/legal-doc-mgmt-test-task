@@ -52,7 +52,7 @@ A modern web application for managing and viewing legal documents with text extr
 ## Getting Started
 
 ### Prerequisites
-- Node.js (v16 or higher)
+- Node.js (v18 or higher)
 - npm or yarn
 
 ### Installation
