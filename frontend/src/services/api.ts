@@ -28,7 +28,10 @@ export const getDocumentMetadata = async (documentId: string): Promise<DocumentM
   return response.data;
 };
 
-export const getDocumentExtractions = async (documentId: string): Promise<DocumentExtractions> => {
-  const response = await api.get(`/documents/${documentId}/extractions`);
-  return response.data;
+export const getDocumentExtractions = async (documentId: string, totalPages: number): Promise<any> => {
+  const response = await fetch(`${API_BASE_URL}/documents/${documentId}/extractions?totalPages=${totalPages}`);
+  if (!response.ok) {
+    throw new Error('Failed to fetch document extractions');
+  }
+  return response.json();
 }; 

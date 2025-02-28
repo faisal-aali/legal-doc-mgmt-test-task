@@ -41,14 +41,34 @@ export const uploadDocument = (req: RequestWithFile, res: Response, next: NextFu
 export const getExtractions = (req: Request, res: Response, next: NextFunction) => {
   try {
     const documentId = req.params.id;
+    const totalPages = parseInt(req.query.totalPages as string);
     const document = documents.get(documentId);
 
     if (!document || !document.hasFile) {
       throw new CustomError('Document not found', 404);
     }
 
-    const extractions = generateMockExtractions(documentId);
-    res.status(200).json(extractions);
+    if (isNaN(totalPages) || totalPages <= 0) {
+      throw new CustomError('Invalid total pages parameter', 400);
+    }
+
+    // Generate extractions and filter by total pages
+    const mockExtractions = generateMockExtractions(documentId);
+    const validExtractions = mockExtractions.extractions.filter(ext => ext.pageNumber <= totalPages);
+
+    // Ensure at least one extraction is returned
+    if (validExtractions.length === 0) {
+      validExtractions.push({
+        id: 'default',
+        text: 'No text extractions found in this document.',
+        pageNumber: 1
+      });
+    }
+
+    res.status(200).json({
+      documentId,
+      extractions: validExtractions
+    });
   } catch (error) {
     next(error);
   }

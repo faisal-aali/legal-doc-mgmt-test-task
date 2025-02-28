@@ -19,25 +19,27 @@ const DocumentDetailsModal: React.FC<DocumentDetailsModalProps> = ({
   const [extractions, setExtractions] = useState<Extraction[]>([]);
   const [pdfError, setPdfError] = useState<string | null>(null);
 
+  // Fetch extractions only after PDF is loaded and we know total pages
   useEffect(() => {
-    if (isOpen && documentId) {
-      getDocumentExtractions(documentId)
+    if (isOpen && documentId && numPages !== null) {
+      getDocumentExtractions(documentId, numPages)
         .then((data) => {
-          // Filter out extractions with invalid page numbers
-          const validExtractions = numPages 
-            ? data.extractions.filter(ext => ext.pageNumber <= numPages && ext.pageNumber > 0)
-            : data.extractions;
-          setExtractions(validExtractions);
+          setExtractions(data.extractions);
         })
-        .catch((error) => console.error('Error fetching extractions:', error));
+        .catch((error) => {
+          console.error('Error fetching extractions:', error);
+          setExtractions([{
+            id: 'default',
+            text: 'Unable to load extractions. Please try again later.',
+            pageNumber: 1
+          }]);
+        });
     }
-  }, [isOpen, documentId, numPages]); // Added numPages as dependency
+  }, [isOpen, documentId, numPages]);
 
   const onDocumentLoadSuccess = ({ numPages }: { numPages: number }) => {
     setPdfError(null);
     setNumPages(numPages);
-    // Re-validate extractions when PDF loads
-    setExtractions(prev => prev.filter(ext => ext.pageNumber <= numPages && ext.pageNumber > 0));
   };
 
   const onDocumentLoadError = (error: Error) => {
