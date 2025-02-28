@@ -10,7 +10,7 @@ import { CustomError } from './utils/errors';
 dotenv.config();
 
 const app: Express = express();
-const port = process.env.PORT || 3000;
+const port = process.env.PORT || 4000;
 
 // Create uploads directory if it doesn't exist
 const uploadsDir = path.join(__dirname, '../uploads');
