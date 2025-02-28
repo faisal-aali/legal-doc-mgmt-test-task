@@ -22,14 +22,22 @@ const DocumentDetailsModal: React.FC<DocumentDetailsModalProps> = ({
   useEffect(() => {
     if (isOpen && documentId) {
       getDocumentExtractions(documentId)
-        .then((data) => setExtractions(data.extractions))
+        .then((data) => {
+          // Filter out extractions with invalid page numbers
+          const validExtractions = numPages 
+            ? data.extractions.filter(ext => ext.pageNumber <= numPages && ext.pageNumber > 0)
+            : data.extractions;
+          setExtractions(validExtractions);
+        })
         .catch((error) => console.error('Error fetching extractions:', error));
     }
-  }, [isOpen, documentId]);
+  }, [isOpen, documentId, numPages]); // Added numPages as dependency
 
   const onDocumentLoadSuccess = ({ numPages }: { numPages: number }) => {
     setPdfError(null);
     setNumPages(numPages);
+    // Re-validate extractions when PDF loads
+    setExtractions(prev => prev.filter(ext => ext.pageNumber <= numPages && ext.pageNumber > 0));
   };
 
   const onDocumentLoadError = (error: Error) => {
