@@ -1,48 +1,48 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { DocumentBoxProps } from '../types/document';
+import UploadModal from './UploadModal';
 import './DocumentBox.css';
 
 const DocumentBox: React.FC<DocumentBoxProps> = ({ id, metadata, onUpload, onView }) => {
+  const [isUploadModalOpen, setIsUploadModalOpen] = useState(false);
+
   const handleClick = () => {
     if (metadata?.hasFile) {
       onView();
     } else {
-      document.getElementById(`file-input-${id}`)?.click();
+      setIsUploadModalOpen(true);
     }
   };
 
-  const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    const file = event.target.files?.[0];
-    if (file && file.type === 'application/pdf') {
-      onUpload(file);
-    } else {
-      alert('Please select a PDF file');
-    }
+  const handleUpload = (file: File) => {
+    onUpload(file);
+    setIsUploadModalOpen(false);
   };
 
   return (
-    <div className="document-box" onClick={handleClick}>
-      <input
-        type="file"
-        id={`file-input-${id}`}
-        accept=".pdf"
-        style={{ display: 'none' }}
-        onChange={handleFileChange}
-      />
-      <div className="document-content">
-        {metadata?.hasFile ? (
-          <>
-            <h3>{metadata.fileName}</h3>
-            <p>Uploaded: {new Date(metadata.uploadDate).toLocaleDateString()}</p>
-          </>
-        ) : (
-          <>
-            <h3>Legal Document {id}</h3>
-            <p>Click to upload</p>
-          </>
-        )}
+    <>
+      <div className="document-box" onClick={handleClick}>
+        <div className="document-content">
+          {metadata?.hasFile ? (
+            <>
+              <h3>{metadata.fileName}</h3>
+              <p>Uploaded: {new Date(metadata.uploadDate).toLocaleDateString()}</p>
+            </>
+          ) : (
+            <>
+              <h3>Legal Document {id}</h3>
+              <p>Click to upload</p>
+            </>
+          )}
+        </div>
       </div>
-    </div>
+      <UploadModal
+        isOpen={isUploadModalOpen}
+        onClose={() => setIsUploadModalOpen(false)}
+        onUpload={handleUpload}
+        documentId={id}
+      />
+    </>
   );
 };
 
