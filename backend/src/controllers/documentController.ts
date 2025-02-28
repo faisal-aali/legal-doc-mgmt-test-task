@@ -3,9 +3,6 @@ import { createDocument, getDocumentMetadata as getDocumentMetadataFromService, 
 import { CustomError } from '../utils/errors';
 import { DocumentMetadata } from '../types/document';
 
-// In-memory storage for document metadata
-const documents: Map<string, DocumentMetadata> = new Map();
-
 interface RequestWithFile extends Request {
   file?: Express.Multer.File;
 }

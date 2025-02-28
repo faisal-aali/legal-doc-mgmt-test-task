@@ -79,11 +79,6 @@ const UploadModal: React.FC<UploadModalProps> = ({
           />
           <p className="file-requirements">Accepted format: PDF only</p>
           {error && <p className="error-message">{error}</p>}
-          {selectedFile && (
-            <p className="selected-file">
-              Selected: {selectedFile.name}
-            </p>
-          )}
         </div>
         <div className="modal-actions">
           <button type="button" onClick={handleClose} className="cancel-button">

@@ -1,16 +1,40 @@
-import express from 'express';
+import { Router } from 'express';
 import { uploadDocument, getExtractions, getDocumentMetadata } from '../controllers/documentController';
 import { upload } from '../middleware/upload';
+import {
+  validateDocumentId,
+  validateTotalPages,
+  validateFileUpload,
+  handleValidationErrors,
+} from '../middleware/validation';
 
-const router = express.Router();
+const router = Router();
 
-// Upload a document
-router.post('/:id/upload', upload.single('file'), uploadDocument);
+// Upload document route with validation
+router.post(
+  '/:id/upload',
+  validateDocumentId,
+  handleValidationErrors,
+  upload.single('file'),
+  validateFileUpload,
+  uploadDocument
+);
 
-// Get document extractions
-router.get('/:id/extractions', getExtractions);
+// Get extractions route with validation
+router.get(
+  '/:id/extractions',
+  validateDocumentId,
+  validateTotalPages,
+  handleValidationErrors,
+  getExtractions
+);
 
-// Get document metadata
-router.get('/:id', getDocumentMetadata);
+// Get metadata route with validation
+router.get(
+  '/:id',
+  validateDocumentId,
+  handleValidationErrors,
+  getDocumentMetadata
+);
 
 export default router; 
