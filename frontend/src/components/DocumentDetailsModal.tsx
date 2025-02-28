@@ -126,8 +126,9 @@ const DocumentDetailsModal: React.FC<DocumentDetailsModalProps> = ({
                   <button
                     onClick={() => goToPage(extraction.pageNumber)}
                     className="go-to-page-button"
+                    disabled={currentPage === extraction.pageNumber}
                   >
-                    Go to Page
+                    {currentPage === extraction.pageNumber ? 'Current Page' : 'Go to Page'}
                   </button>
                 </div>
               </div>

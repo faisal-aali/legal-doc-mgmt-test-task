@@ -44,8 +44,15 @@ export const getExtractions = (req: Request, res: Response, next: NextFunction) 
     const totalPages = parseInt(req.query.totalPages as string);
     const document = documents.get(documentId);
 
-    if (!document || !document.hasFile) {
-      throw new CustomError('Document not found', 404);
+    // Check if document exists in storage, if not create a default metadata
+    if (!document) {
+      const defaultMetadata: DocumentMetadata = {
+        id: documentId,
+        fileName: `Document ${documentId}`,
+        uploadDate: new Date().toISOString(),
+        hasFile: false
+      };
+      documents.set(documentId, defaultMetadata);
     }
 
     if (isNaN(totalPages) || totalPages <= 0) {
