@@ -1,11 +1,13 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, lazy, Suspense } from 'react';
 import Modal from 'react-modal';
 import { DocumentDetailsModalProps, Extraction } from '../types/document';
 import { getDocumentExtractions } from '../services/api';
 import { API_BASE_URL } from '../services/api';
-import PDFViewer from './PDFViewer';
 import ExtractionsPanel from './ExtractionsPanel';
 import './DocumentDetailsModal.css';
+
+// Lazy load the PDF viewer component
+const PDFViewer = lazy(() => import('./PDFViewer'));
 
 Modal.setAppElement('#root');
 
@@ -63,14 +65,16 @@ const DocumentDetailsModal: React.FC<DocumentDetailsModalProps> = ({
           pdfError ? (
             <div className="error">Failed to load PDF: {pdfError}</div>
           ) : (
-            <PDFViewer
-              fileUrl={API_BASE_URL.replace('/api', '') + metadata.fileUrl}
-              currentPage={currentPage}
-              numPages={numPages}
-              onPageChange={setCurrentPage}
-              onLoadSuccess={onDocumentLoadSuccess}
-              onLoadError={onDocumentLoadError}
-            />
+            <Suspense fallback={<div className="loading">Loading PDF viewer...</div>}>
+              <PDFViewer
+                fileUrl={API_BASE_URL.replace('/api', '') + metadata.fileUrl}
+                currentPage={currentPage}
+                numPages={numPages}
+                onPageChange={setCurrentPage}
+                onLoadSuccess={onDocumentLoadSuccess}
+                onLoadError={onDocumentLoadError}
+              />
+            </Suspense>
           )
         ) : (
           <div className="error">No PDF file available.</div>
